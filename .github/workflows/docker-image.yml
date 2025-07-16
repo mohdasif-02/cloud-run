@@ -23,28 +23,28 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           token_format: 'access_token'
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+          workload_identity_provider: projects/915484313024/locations/global/workloadIdentityPools/my-pool/providers/github
+          service_account: gke-workload@praveen-345.iam.gserviceaccount.com
 
       - name: Set up gcloud CLI
         uses: google-github-actions/setup-gcloud@v2
         with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          project_id: praveen-345
 
       - name: Configure Docker for GCR
         run: gcloud auth configure-docker
 
       - name: Build and Push Docker Image
         run: |
-          IMAGE="gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.CLOUD_RUN_SERVICE }}"
+          IMAGE="asia-south1-docker.pkg.dev/praveen-345/argocd-rollout/test-cloud-run"
           docker build -t $IMAGE ./app
           docker push $IMAGE
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy ${{ secrets.CLOUD_RUN_SERVICE }} \
-            --image=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.CLOUD_RUN_SERVICE }} \
-            --region=${{ secrets.GCP_REGION }} \
+          gcloud run deploy test-cloud-run \
+            --image=asia-south1-docker.pkg.dev/praveen-345/argocd-rollout/test-cloud-run \
+            --region=asia-south1 \
             --platform=managed \
             --allow-unauthenticated
 
