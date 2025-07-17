@@ -7,6 +7,14 @@ on:
     paths:
       - 'app/**'
 
+env:
+  PROJECT_ID: praveen-345
+  IMAGE_NAME: test-cloud-run
+  REPOSITORY_REGION: asia-south1
+  REPOSITORY_NAME: argocd-rollout
+  CLOUD_RUN_SERVICE: test-cloud-run
+  CLOUD_RUN_REGION: asia-south1
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -19,35 +27,38 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Authenticate with Google Cloud
+      - name: Authenticate to GCP using Workload Identity Federation
         uses: google-github-actions/auth@v2
         with:
-          token_format: 'access_token'
+          token_format: access_token
           workload_identity_provider: projects/915484313024/locations/global/workloadIdentityPools/my-pool/providers/github
-          service_account: gke-workload@praveen-345.iam.gserviceaccount.com
+          service_account: gke-workload@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
 
       - name: Set up gcloud CLI
         uses: google-github-actions/setup-gcloud@v2
         with:
-           project_id: praveen-345
+          project_id: ${{ env.PROJECT_ID }}
 
       - name: Authenticate Docker to Artifact Registry
         run: |
-          gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://asia-south1-docker.pkg.dev
+          gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://${{ env.REPOSITORY_REGION }}-docker.pkg.dev
 
-
-
-      - name: Build and Push Docker Image
+      - name: Build Docker image
         run: |
-          IMAGE="asia-south1-docker.pkg.dev/praveen-345/argocd-rollout/test-cloud-run"
+          IMAGE=${{ env.REPOSITORY_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:latest
           docker build -t $IMAGE ./app
+
+      - name: Push Docker image to Artifact Registry
+        run: |
+          IMAGE=${{ env.REPOSITORY_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:latest
           docker push $IMAGE
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy test-cloud-run \
-            --image=asia-south1-docker.pkg.dev/praveen-345/argocd-rollout/test-cloud-run \
-            --region=asia-south1 \
+          IMAGE=${{ env.REPOSITORY_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:latest
+          gcloud run deploy ${{ env.CLOUD_RUN_SERVICE }} \
+            --image=$IMAGE \
+            --region=${{ env.CLOUD_RUN_REGION }} \
             --platform=managed \
-            --allow-unauthenticated
-
+            --allow-unauthenticated \
+            --quiet
