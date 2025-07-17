@@ -16,5 +16,3 @@ steps:
         '--allow-unauthenticated'
       ]
 
-images:
-  - asia-south1-docker.pkg.dev/praveen-345/argocd-rollout/test-cloud-run
