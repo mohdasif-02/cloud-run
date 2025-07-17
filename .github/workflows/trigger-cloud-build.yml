@@ -3,7 +3,7 @@ name: Trigger Cloud Build on Python Change
 on:
   push:
     branches: [main]
-    paths: ['*.py', 'cloudbuild.yaml']
+    paths: ['*.py', 'cloudbuild.yaml', 'Dockerfile']
 
 jobs:
   trigger-cloud-build:
@@ -15,13 +15,13 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4  # ✅ This step fetches your code
+        uses: actions/checkout@v4
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           token_format: access_token
-          workload_identity_provider: projects/915484313024/locations/global/workloadIdentityPools/test-pool/providers/github
+          workload_identity_provider: projects/915484313024/locations/global/workloadIdentityPools/my-pool/providers/github
           service_account: gke-workload@praveen-345.iam.gserviceaccount.com
 
       - name: Trigger Cloud Build
