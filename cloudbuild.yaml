@@ -1,15 +1,15 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'asia-south1-docker.pkg.dev/praveen-345/argocd-rollout/test-cloud-run', '.']
+    args: ['build', '-t', 'asia-south1-docker.pkg.dev/praveen-345/argocd-rollout/test-cloud', '.']
 
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'asia-south1-docker.pkg.dev/praveen-345/argocd-rollout/test-cloud-run']
+    args: ['push', 'asia-south1-docker.pkg.dev/praveen-345/argocd-rollout/test-cloud']
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
       [
-        'run', 'deploy', 'test-cloud-run',
+        'run', 'deploy', 'test-cloud',
         '--image=asia-south1-docker.pkg.dev/praveen-345/argocd-rollout/test-cloud-run',
         '--region=asia-south1',
         '--platform=managed',
