@@ -22,4 +22,4 @@ jobs:
           service_account: gke-workload@praveen-345.iam.gserviceaccount.com
 
       - name: Trigger Cloud Build
-        run: gcloud builds submit --config cloudbuild.yaml --project=praveen-345
+        run: gcloud builds submit --config cloudbuild.yaml --project=praveen-345 .
