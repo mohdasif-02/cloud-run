@@ -1,5 +1,5 @@
 steps:
-  # Step 1: Build Docker image
+  # Step 1: Build the image
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'build', '-t',
@@ -7,14 +7,14 @@ steps:
       '.'
     ]
 
-  # Step 2: Push Docker image to Artifact Registry
+  # Step 2: Push the image
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'push',
       'asia-south1-docker.pkg.dev/praveen-345/argocd-rollout/test-cloud'
     ]
 
-  # Step 3: Deploy the same image to Cloud Run
+  # Step 3: Deploy to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
@@ -28,5 +28,3 @@ steps:
 
 images:
   - 'asia-south1-docker.pkg.dev/praveen-345/argocd-rollout/test-cloud'
-
-
