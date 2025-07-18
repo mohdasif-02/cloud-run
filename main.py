@@ -4,5 +4,5 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
-    return "Hello from Cloud Run...."
+    return "Hello from Cloud Run.!"
 
